@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>どのプランが合うか、6つの質問で｜Institut für Organic Business</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Old+Mincho:wght@500;700;900&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --point:#f26b3b;
+    --ink:#553727;
+    --bg:#f9f7ef;
+    --second:#0085c9;
+    --sub:#85634b;
+    --line:#e6ddc9;
+    --white:#fffdf8;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{
+    font-family:"Noto Sans JP",sans-serif;
+    color:var(--ink);
+    background:var(--bg);
+    line-height:1.9;
+    font-size:16px;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:680px;margin:0 auto;padding:0 20px;}
+  h1,h2,h3,.mincho{font-family:"Zen Old Mincho",serif;}
+  section{padding:32px 0;}
+
+  /* ===== ヘッダー ===== */
+  .top{background:var(--ink);color:#f3e9dc;padding:34px 0 30px;text-align:center;}
+  .top .eyebrow{font-size:12px;color:#d9c3ac;letter-spacing:.06em;font-weight:700;margin-bottom:10px;}
+  .top h1{font-size:24px;font-weight:700;line-height:1.6;color:#fff;}
+  .top .lead{font-size:14px;color:#e2cfba;line-height:1.85;margin-top:14px;}
+
+  /* ===== 進み具合 ===== */
+  .bar-area{margin-bottom:18px;}
+  .bar-label{font-size:12.5px;color:var(--sub);font-weight:700;margin-bottom:7px;}
+  .bar{height:6px;background:var(--line);border-radius:999px;overflow:hidden;}
+  .bar span{display:block;height:100%;width:0;background:var(--point);border-radius:999px;transition:width .28s ease;}
+
+  /* ===== 質問カード ===== */
+  .qcard{background:var(--white);border:1px solid var(--line);border-radius:16px;padding:22px 18px;}
+  .qcard .qt{font-family:"Zen Old Mincho",serif;font-size:19px;font-weight:700;line-height:1.7;margin-bottom:6px;}
+  .qcard .qs{font-size:13px;color:var(--sub);line-height:1.8;margin-bottom:16px;}
+  .opts{display:flex;flex-direction:column;gap:10px;}
+  .opt{
+    display:block;width:100%;text-align:left;cursor:pointer;
+    font-family:inherit;font-size:15px;line-height:1.75;color:var(--ink);
+    background:var(--bg);border:1.5px solid var(--line);border-radius:12px;
+    padding:14px 16px;transition:border-color .15s ease,background .15s ease;
+  }
+  .opt:hover,.opt:focus-visible{border-color:var(--point);background:#fbeee6;outline:none;}
+  .opt:active{background:#f8e2d5;}
+  .back{
+    display:inline-block;margin-top:18px;background:none;border:none;cursor:pointer;
+    font-family:inherit;font-size:13.5px;color:var(--sub);text-decoration:underline;padding:4px 0;
+  }
+
+  /* ===== 結果 ===== */
+  .result{display:none;}
+  .rlabel{font-size:12.5px;color:var(--second);font-weight:700;letter-spacing:.06em;margin-bottom:10px;}
+  .rcard{background:var(--white);border:1.5px solid var(--point);border-radius:16px;overflow:hidden;box-shadow:0 4px 18px rgba(242,107,59,.15);}
+  .rcard .head{background:var(--point);color:#fff;padding:18px 20px;}
+  .rcard .head .name{display:block;font-family:"Zen Old Mincho",serif;font-weight:700;font-size:22px;letter-spacing:.02em;}
+  .rcard .head .forwho{display:block;font-size:13.5px;line-height:1.7;margin-top:6px;color:#fdeadf;}
+  .rcard .body{padding:20px 18px;}
+  .rcard .oneline{font-size:15.5px;line-height:1.85;margin-bottom:14px;}
+  .rcard .why{font-size:14.5px;color:var(--sub);line-height:1.9;margin-bottom:16px;}
+  .rcard .note{background:#eaf5fb;border-radius:12px;padding:14px 16px;font-size:13.5px;color:#1a5a78;line-height:1.85;margin-bottom:16px;}
+  .rcard .price{text-align:center;padding-top:12px;border-top:1px dashed var(--line);}
+  .rcard .price .eur{font-family:"Zen Old Mincho",serif;font-weight:900;font-size:32px;color:var(--point);line-height:1.3;}
+  .rcard .price .start{font-size:12.5px;color:var(--second);font-weight:700;margin-top:4px;}
+  .go{
+    display:block;background:var(--point);color:#fff;text-decoration:none;text-align:center;
+    font-weight:700;font-size:15.5px;padding:16px;border-radius:12px;margin-top:18px;
+    box-shadow:0 6px 16px rgba(242,107,59,.28);
+  }
+  .subgo{display:block;text-align:center;font-size:14px;color:var(--second);font-weight:700;text-decoration:none;margin-top:14px;}
+  .retry{
+    display:block;margin:18px auto 0;background:none;border:none;cursor:pointer;
+    font-family:inherit;font-size:13.5px;color:var(--sub);text-decoration:underline;padding:4px 8px;
+  }
+  .after{font-size:13.5px;color:var(--sub);line-height:1.9;margin-top:22px;}
+
+  footer{background:var(--ink);color:#e9ddcd;text-align:center;padding:26px 20px;font-size:12px;line-height:1.9;margin-top:10px;}
+  footer a{color:#e9ddcd;}
+
+  @media(max-width:480px){
+    .top h1{font-size:21px;}
+    .qcard{padding:20px 15px;}
+    .qcard .qt{font-size:17.5px;}
+    .opt{font-size:14.5px;padding:13px 14px;}
+    .rcard .head .name{font-size:20px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div class="wrap">
+    <div class="eyebrow">プラン診断</div>
+    <h1>どのプランが合うか、<br>6つの質問で確かめる</h1>
+    <p class="lead">3つのプランは、内容が積み上がる形になっています。いまの進み具合と、月にどれくらい時間を取れるかで、合う場所が変わります。1分ほどで終わります。</p>
+  </div>
+</div>
+
+<section>
+  <div class="wrap">
+
+    <div id="quiz">
+      <div class="bar-area">
+        <div class="bar-label" id="barLabel">質問 1 / 6</div>
+        <div class="bar"><span id="barFill"></span></div>
+      </div>
+
+      <div class="qcard">
+        <div class="qt" id="qTitle"></div>
+        <div class="qs" id="qSub"></div>
+        <div class="opts" id="qOpts"></div>
+      </div>
+
+      <button class="back" id="backBtn" type="button" style="display:none;">← ひとつ前の質問に戻る</button>
+    </div>
+
+    <div class="result" id="result">
+      <div class="rlabel">診断のこたえ</div>
+      <div class="rcard">
+        <div class="head">
+          <span class="name" id="rName"></span>
+          <span class="forwho" id="rFor"></span>
+        </div>
+        <div class="body">
+          <p class="oneline" id="rOne"></p>
+          <p class="why" id="rWhy"></p>
+          <div class="note" id="rNote" style="display:none;"></div>
+          <div class="price">
+            <div class="eur" id="rPrice"></div>
+            <div class="start">10月 開始</div>
+          </div>
+          <a class="go" id="rGo" href="#">このプランの詳しい中身を見る</a>
+          <a class="subgo" href="index.html#plan-daily">3つのプランを並べて見る</a>
+        </div>
+      </div>
+      <button class="retry" id="retryBtn" type="button">もう一度、最初から答える</button>
+      <p class="after">診断のこたえは、選ぶときの手がかりです。読んでみて別のプランのほうがしっくりくるなら、そちらを選んでかまいません。迷ったときは school@iob.bio までご相談ください。</p>
+    </div>
+
+  </div>
+</section>
+
+<footer>
+  Institut für Organic Business GmbH<br>
+  お問い合わせ：school@iob.bio<br><br>
+  <a href="index.html">募集ページに戻る</a><br><br>
+  Copyright ©2026 Institut für Organic Business GmbH. All Rights Reserved.
+</footer>
+
+<script>
+(function(){
+  // ── 設問。各選択肢は D（Daily Letters）/ F（Startup Circle）/ L（Leaders Lounge）に点を入れる ──
+  var QUESTIONS = [
+    {
+      t:"進め方を決めるとき、どちらが近いですか",
+      s:"どちらが正しいということはありません。やりやすいほうを選んでください。",
+      o:[
+        {label:"自分で決めて、そのまま進めるほうが早い", p:{D:2}},
+        {label:"人に話しているうちに、考えがまとまってくる", p:{F:2}},
+        {label:"自分で決めたあとに、経験のある人の見立てを聞きたい", p:{L:2}}
+      ]
+    },
+    {
+      t:"「何を、誰に、いくらで」は決まっていますか",
+      s:"3つのうち、ひとつでも決まっていなければ「途中」を選んでください。",
+      o:[
+        {label:"3つとも決まっていて、そのとおりに動いている", p:{L:2}},
+        {label:"だいたい決まっているが、値段や届け方のところで止まっている", p:{F:2}},
+        {label:"まだこれから考えるところ", p:{F:1,D:1}}
+      ]
+    },
+    {
+      t:"いまの状況に、いちばん近いのはどれですか",
+      s:"",
+      o:[
+        {label:"商品もお客さんもいて、注文が続いている", p:{L:2}},
+        {label:"商品の形はできたが、お客さんに届けるのはこれから", p:{F:2}},
+        {label:"何をつくるか、まだ探している", p:{D:2}}
+      ]
+    },
+    {
+      t:"月に1回、90分のオンラインに参加できそうですか",
+      s:"共同学習会もリーダーズラウンジも、月に1回オンラインで集まります。",
+      o:[
+        {label:"その時間なら、予定を空けられる", p:{F:1,L:1}},
+        {label:"月によるが、たぶん出られる", p:{F:1}},
+        {label:"いまは家や仕事の予定が読めない", p:{D:2}, hardDaily:true}
+      ]
+    },
+    {
+      t:"学ぶペースは、どちらが続きますか",
+      s:"",
+      o:[
+        {label:"毎日少しずつ、短い時間のほうが続く", p:{D:2}},
+        {label:"月に1回、まとめて時間を取るほうが進む", p:{F:1,L:1}},
+        {label:"毎日の分と、月1回の集まりと、両方あると助かる", p:{F:2}}
+      ]
+    },
+    {
+      t:"いま、いちばんほしいものはどれですか",
+      s:"",
+      o:[
+        {label:"毎日手を動かす習慣と、そのための材料", p:{D:2}},
+        {label:"自分の事業の形を、人と一緒に組み立てる場所", p:{F:2}},
+        {label:"詰まったときに、その場で相談できる相手", p:{L:2}}
+      ]
+    }
+  ];
+
+  var PLANS = {
+    D:{
+      name:"Daily Letters",
+      forwho:"まず自分のペースで始めたい人に",
+      price:"€280",
+      anchor:"index.html#plan-daily",
+      one:"毎日1通のメールレッスンで、自分のペースのまま手を動かしていく形です。",
+      why:"あなたの答えを見ると、いまは自分で決めて進むほうが動きやすそうです。毎日1通メールが届けば、考える材料が途切れません。共同学習会にも年に1〜2回招かれるので、ほかの人がどう進めているかを見る機会もあります。"
+    },
+    F:{
+      name:"Startup Circle",
+      forwho:"「何を、誰に、いくらで」が決まらないまま止まっている人に",
+      price:"€540",
+      anchor:"index.html#plan-founders",
+      one:"毎日のメールレッスンに、月1回90分の共同学習会がつきます。",
+      why:"「何を、誰に、いくらで」のどこかが止まっているときは、一人で考えても同じところを回りやすくなります。月に一度、少人数で顔を合わせて言葉にしていくと、あいまいだったところが形になります。毎日のメールは、その間に手を動かすための材料になります。"
+    },
+    L:{
+      name:"Leaders Lounge",
+      forwho:"すでに動いていて、相談できる相手がほしい人に",
+      price:"€850",
+      anchor:"index.html#plan-lounge",
+      one:"共同学習会に、月1回のグループコンサル（リーダーズラウンジ）が加わります。",
+      why:"商品もお客さんもある段階になると、迷うのはやり方より判断のほうです。月1回のグループコンサルなら、いま抱えている状況をそのまま持ち込んで相談できます。毎日のメールと共同学習会も、すべて入ります。"
+    }
+  };
+
+  // 隣のプランへの一言（結果カード内の水色ブロック）
+  var HINTS = {
+    D:"話しながら決めたい気持ちが出てきたら、共同学習会のつく Startup Circle に移る形もあります。",
+    F:"すでに商品もお客さんもあって、判断の相談相手がほしいなら、Leaders Lounge のほうが近いかもしれません。",
+    L:"月2回のオンラインが重そうなら、共同学習会だけの Startup Circle から始める形もあります。"
+  };
+
+  var TIME_NOTE = "月に1回の集まりに出るのが、いまは難しいとのことでした。共同学習会もリーダーズラウンジも集まりが中心なので、まずはメールレッスンだけで進める形をおすすめします。予定が読めるようになったら、あとから上のプランに移れます。";
+
+  var answers = [];
+  var idx = 0;
+
+  var el = {
+    quiz:document.getElementById('quiz'),
+    result:document.getElementById('result'),
+    barLabel:document.getElementById('barLabel'),
+    barFill:document.getElementById('barFill'),
+    qTitle:document.getElementById('qTitle'),
+    qSub:document.getElementById('qSub'),
+    qOpts:document.getElementById('qOpts'),
+    backBtn:document.getElementById('backBtn'),
+    retryBtn:document.getElementById('retryBtn'),
+    rName:document.getElementById('rName'),
+    rFor:document.getElementById('rFor'),
+    rOne:document.getElementById('rOne'),
+    rWhy:document.getElementById('rWhy'),
+    rNote:document.getElementById('rNote'),
+    rPrice:document.getElementById('rPrice'),
+    rGo:document.getElementById('rGo')
+  };
+
+  function render(){
+    var q = QUESTIONS[idx];
+    el.barLabel.textContent = '質問 ' + (idx+1) + ' / ' + QUESTIONS.length;
+    el.barFill.style.width = Math.round(idx / QUESTIONS.length * 100) + '%';
+    el.qTitle.textContent = q.t;
+    el.qSub.textContent = q.s;
+    el.qSub.style.display = q.s ? '' : 'none';
+    el.qOpts.innerHTML = '';
+    q.o.forEach(function(opt, i){
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'opt';
+      b.textContent = opt.label;
+      b.addEventListener('click', function(){ choose(i); });
+      el.qOpts.appendChild(b);
+    });
+    el.backBtn.style.display = idx > 0 ? '' : 'none';
+  }
+
+  function choose(i){
+    answers[idx] = i;
+    if(idx < QUESTIONS.length - 1){
+      idx++;
+      render();
+      window.scrollTo({top:0, behavior:'smooth'});
+    }else{
+      show();
+    }
+  }
+
+  function judge(){
+    var score = {D:0, F:0, L:0};
+    var hardDaily = false;
+    answers.forEach(function(ai, qi){
+      var opt = QUESTIONS[qi].o[ai];
+      if(opt.hardDaily) hardDaily = true;
+      Object.keys(opt.p).forEach(function(k){ score[k] += opt.p[k]; });
+    });
+    if(hardDaily) return {key:'D', timeLimited:true};
+    // 同点のときは、下のプランを先に取る（無理なく始められるほうを勧める）
+    var order = ['D','F','L'];
+    var best = 'D';
+    order.forEach(function(k){ if(score[k] > score[best]) best = k; });
+    return {key:best, timeLimited:false};
+  }
+
+  function show(){
+    var r = judge();
+    var p = PLANS[r.key];
+    el.rName.textContent = p.name;
+    el.rFor.textContent = p.forwho;
+    el.rOne.textContent = p.one;
+    el.rWhy.textContent = p.why;
+    el.rPrice.textContent = p.price;
+    el.rGo.setAttribute('href', p.anchor);
+    el.rGo.textContent = p.name + ' の詳しい中身を見る';
+    var note = r.timeLimited ? TIME_NOTE : HINTS[r.key];
+    el.rNote.textContent = note;
+    el.rNote.style.display = '';
+    el.quiz.style.display = 'none';
+    el.result.style.display = 'block';
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+
+  el.backBtn.addEventListener('click', function(){
+    if(idx > 0){ idx--; render(); }
+  });
+
+  el.retryBtn.addEventListener('click', function(){
+    answers = [];
+    idx = 0;
+    el.result.style.display = 'none';
+    el.quiz.style.display = 'block';
+    render();
+    window.scrollTo({top:0, behavior:'smooth'});
+  });
+
+  render();
+})();
+</script>
+
+</body>
+</html>
