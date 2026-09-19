@@ -319,7 +319,7 @@
 <script>
 /* ── 公開期間ゲート（2026-09-19 なつこ決定・日本時間）──────────────
    sale  ：〜9/23(水)23:59        録画（届いたら）→ 3サービス → 申込フォーム
-   trial ：9/24(木)0:00〜10/3(土)11:59  録画 ＋「受付終了・体験会へ」だけ
+   trial ：9/24(木)0:00〜10/3(土)11:59  「受付終了・体験会へ」だけ（録画は9/23で終了）
    close ：10/3(土)12:00〜          終了画面だけ（10/3 12:00 にリポジトリも非公開にする予約あり）
    確認用：?preview=trial / ?preview=close は「これから先の状態」だけ見られる（過去には戻せない）*/
 window.IOB_PHASE = (function(){
@@ -353,20 +353,20 @@ window.IOB_PHASE = (function(){
 </head>
 <body>
 
-<!-- ============ 同窓会の録画（ARCHIVE_VIMEO を入れると表示・10/3 12:00で自動的に見えなくなる） ============ -->
+<!-- ============ 同窓会の録画（ARCHIVE_VIMEO を入れると表示・9/23 23:59 JSTで自動的に見えなくなる） ============ -->
 <section id="archive">
   <div class="wrap">
     <div class="ey">9月20日 専門家コース同窓会の録画</div>
     <h2>当日の様子を、そのままご覧いただけます</h2>
     <div class="video-frame"><iframe id="archive-player" src="" title="専門家コース同窓会 2026 の録画" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen loading="lazy"></iframe></div>
-    <p class="lim">公開は10月3日（土）12:00（日本時間）までです。</p>
+    <p class="lim">公開は9月23日（水）23:59（日本時間）までです。</p>
   </div>
 </section>
 
 <!-- ============ 9/24〜10/3 12:00：受付終了 → 体験会へ ============ -->
 <section id="trial-cta">
   <div class="wrap">
-    <h2>3つの場所のお申し込みは、<br>9月23日で締め切りました</h2>
+    <h2>3つの場所のお申し込みと、<br>同窓会の録画の公開は、<br>9月23日で終了しました</h2>
     <p>まだ迷っている方のために、10月4日（日）19:00から、オンラインの体験会を開きます。<br>共同学習会とグルコンを、その場で体験していただけます。</p>
     <a class="btn" href="https://iobschool.github.io/iob-trial-2026/">体験会のご案内を見る</a>
   </div>
@@ -1126,7 +1126,7 @@ window.IOB_PHASE = (function(){
 /* 🚨 録画を出すとき：下の ARCHIVE_VIMEO に Vimeo の「埋め込み用URL」（https://player.vimeo.com/video/…）を入れて push するだけ */
 (function(){
   var ARCHIVE_VIMEO = "";
-  if (!ARCHIVE_VIMEO || window.IOB_PHASE === "close") return;
+  if (!ARCHIVE_VIMEO || window.IOB_PHASE !== "sale") return; // 録画は9/23 23:59 JSTまで（参加・不参加とも共通・なつこ決定）
   document.getElementById("archive-player").src = ARCHIVE_VIMEO;
   document.getElementById("archive").className = "on";
 })();
