@@ -343,6 +343,15 @@ window.IOB_PHASE = (function(){
   #archive.on{display:block;}
   #archive .ey{color:#ffd7a6;font-size:12.5px;font-weight:700;letter-spacing:.06em;margin-bottom:8px;}
   #archive h2{color:#fff;font-size:21px;line-height:1.6;margin-bottom:14px;}
+  #archive .toc{list-style:none;margin:18px 0 0;border-top:1px solid rgba(255,255,255,.18);}
+  #archive .toc li{border-bottom:1px solid rgba(255,255,255,.18);}
+  #archive .toc button{all:unset;box-sizing:border-box;display:flex;gap:12px;width:100%;padding:13px 2px;cursor:pointer;color:#fff;align-items:flex-start;}
+  #archive .toc button[disabled]{cursor:default;}
+  #archive .toc .tm{flex:none;min-width:58px;font-family:"Zen Old Mincho",serif;font-weight:700;color:#ffd7a6;font-size:14px;padding-top:1px;}
+  #archive .toc .tt{font-size:14.5px;line-height:1.7;font-weight:700;}
+  #archive .toc .ts{display:block;font-size:12.5px;color:#d9c3ac;font-weight:400;margin-top:2px;line-height:1.7;}
+  #archive .toc button:not([disabled]):hover .tt{text-decoration:underline;}
+  #archive .toc-note{color:#d9c3ac;font-size:12.5px;margin-top:10px;}
   #archive .lim{color:#d9c3ac;font-size:13px;margin-top:10px;line-height:1.8;}
   #trial-cta{background:var(--point);color:#fff;padding:34px 0;text-align:center;}
   #trial-cta h2{font-size:21px;line-height:1.6;margin-bottom:12px;color:#fff;}
@@ -359,6 +368,8 @@ window.IOB_PHASE = (function(){
     <div class="ey">9月20日 専門家コース同窓会の録画</div>
     <h2>当日の様子を、そのままご覧いただけます</h2>
     <div class="video-frame"><iframe id="archive-player" src="" title="専門家コース同窓会 2026 の録画" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen loading="lazy"></iframe></div>
+    <p class="toc-note" id="toc-note">目次を押すと、その場面から再生されます。</p>
+    <ol class="toc" id="toc"></ol>
     <p class="lim">公開は9月23日（水）23:59（日本時間）までです。</p>
   </div>
 </section>
@@ -1122,13 +1133,53 @@ window.IOB_PHASE = (function(){
 
 </script>
 
+<script src="https://player.vimeo.com/api/player.js"></script>
 <script>
-/* 🚨 録画を出すとき：下の ARCHIVE_VIMEO に Vimeo の「埋め込み用URL」（https://player.vimeo.com/video/…）を入れて push するだけ */
+/* 🚨 録画を出すとき：ARCHIVE_VIMEO に Vimeo の「埋め込み用URL」（https://player.vimeo.com/video/…）を入れて push するだけ
+   🚨 目次の時刻：録画を見てから CHAPTERS の t に "12:34" や "1:02:30" の形で入れる。空のあいだは時刻なしで表示され、押せない
+   （目次の項目名・順番は、YCS山下さんコンサルの続きのセッションで決定・メールの目次と揃えてある。勝手に変えない） */
 (function(){
   var ARCHIVE_VIMEO = "";
-  if (!ARCHIVE_VIMEO || window.IOB_PHASE !== "sale") return; // 録画は9/23 23:59 JSTまで（参加・不参加とも共通・なつこ決定）
-  document.getElementById("archive-player").src = ARCHIVE_VIMEO;
+  var CHAPTERS = [
+    { t: "", title: "オープニング（なぜこの会を開いたか）" },
+    { t: "", title: "気候変動トークセッション", sub: "あさきちゃんのお話／川田むつみさん × レムケなつこの対談／みんなで意見交換" },
+    { t: "", title: "挑戦者トークセッション", sub: "猿田一生さん／森奈央さん／羽田野嘉雄さん" },
+    { t: "", title: "マッチング交流会（小部屋を私が回っている様子）" },
+    { t: "", title: "新しい3つの場所の発表" },
+    { t: "", title: "ゆうきちゃんのお話" },
+    { t: "", title: "フィナーレ", sub: "今日の一言を持ち寄って、また会おうね！" }
+  ];
+  if (!ARCHIVE_VIMEO || window.IOB_PHASE !== "sale") return; // 録画は9/23 23:59 JSTまで（なつこ決定・要確認中）
+
+  var frame = document.getElementById("archive-player");
+  frame.src = ARCHIVE_VIMEO;
   document.getElementById("archive").className = "on";
+
+  function toSec(t){ var p = String(t).split(":").map(Number); var s = 0; p.forEach(function(v){ s = s * 60 + v; }); return s; }
+  var player = null;
+  try { if (window.Vimeo && Vimeo.Player) player = new Vimeo.Player(frame); } catch (e) {}
+  // 目次を押したとき：まずプレーヤー操作で移動。1.5秒たっても移動できなければ、再生位置つきで読み込み直す（予備）
+  function reloadAt(sec){
+    frame.src = ARCHIVE_VIMEO.split("#")[0] + (ARCHIVE_VIMEO.indexOf("?") === -1 ? "?" : "&") + "autoplay=1#t=" + sec + "s";
+    try { player = new Vimeo.Player(frame); } catch (e) { player = null; }
+  }
+  function seek(sec){
+    frame.scrollIntoView({ behavior: "smooth", block: "center" });
+    if (!player) { reloadAt(sec); return; }
+    var moved = false;
+    player.setCurrentTime(sec).then(function(){ moved = true; return player.play(); }).catch(function(){});
+    setTimeout(function(){ if (!moved) reloadAt(sec); }, 1500);
+  }
+
+  var ol = document.getElementById("toc"), anyTime = false;
+  CHAPTERS.forEach(function(c){
+    var li = document.createElement("li"), btn = document.createElement("button");
+    btn.type = "button";
+    btn.innerHTML = '<span class="tm">' + (c.t || "") + '</span><span class="tt">' + c.title + (c.sub ? '<span class="ts">' + c.sub + '</span>' : '') + '</span>';
+    if (c.t) { anyTime = true; btn.addEventListener("click", function(){ seek(toSec(c.t)); }); } else { btn.disabled = true; }
+    li.appendChild(btn); ol.appendChild(li);
+  });
+  if (!anyTime) document.getElementById("toc-note").style.display = "none";
 })();
 </script>
 </body>
