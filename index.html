@@ -883,7 +883,7 @@ window.IOB_PHASE = (function(){
     <h3 class="sec-title" style="margin-top:34px;">決済方法</h3>
     <table class="pay-table">
       <tr><th>銀行振込（日本・ドイツ）</th><td>一括のみ</td></tr>
-      <tr><th>Stripe／PayPal<br>（全プラン共通）</th><td>一括／3回分割（手数料なし）</td></tr>
+      <tr><th>Stripe／PayPal<br>（全プラン共通）</th><td>一括／3回分割（手数料なし・端数は切り上げ）</td></tr>
     </table>
     <p style="font-size:12px;color:var(--sub);margin-top:6px;line-height:1.7;">※3回分割は、金額が3で割り切れないため、1回あたりを1ユーロ単位に切り上げています（Daily Letters €94×3回＝€282／Startup Circle €180×3回＝€540／Leaders Lounge €284×3回＝€852）。</p>
     <p class="callout" style="margin-top:18px;">Stripe・PayPalの決済リンクは、お申し込みフォーム送信後の自動返信メールでご案内します。<br><b>お支払いは、お申し込みから3日以内にお願いします。</b></p>
@@ -968,6 +968,7 @@ window.IOB_PHASE = (function(){
           <label class="radio-opt"><input type="radio" name="installment" value="一括" checked>一括</label>
           <label class="radio-opt"><input type="radio" name="installment" value="3回分割（手数料なし）">3回分割<br><span style="font-size:11.5px;color:var(--sub);">手数料なし</span></label>
         </div>
+        <p style="font-size:12px;color:var(--sub);margin-top:8px;line-height:1.7;">※3回分割は手数料をいただきませんが、3で割り切れないため1回あたりを切り上げています（€94×3回／€180×3回／€284×3回）。</p>
       </div>
       <div class="field">
         <label>モニター表記のご希望<span class="opt">任意・のちほど改めて伺います</span></label>
