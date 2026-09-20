@@ -354,6 +354,9 @@ window.IOB_PHASE = (function(){
   #archive .toc .tt{font-size:14.5px;line-height:1.7;font-weight:700;}
   #archive .toc .ts{display:block;font-size:12.5px;color:#d9c3ac;font-weight:400;margin-top:2px;line-height:1.7;}
   #archive .toc button:not([disabled]):hover .tt{text-decoration:underline;}
+  #archive .toc li.sub button{padding-left:22px;}
+  #archive .toc li.sub .tt{font-weight:400;font-size:13.5px;color:#e8dccd;}
+  #archive .toc li.sub{border-bottom-color:rgba(255,255,255,.10);}
   #archive .toc-note{color:#d9c3ac;font-size:12.5px;margin-top:10px;}
   #archive .lim{color:#d9c3ac;font-size:13px;margin-top:10px;line-height:1.8;}
   #trial-cta{background:var(--point);color:#fff;padding:34px 0;text-align:center;}
@@ -1189,17 +1192,30 @@ window.IOB_PHASE = (function(){
 <script>
 /* 🚨 録画を出すとき：ARCHIVE_VIMEO に Vimeo の「埋め込み用URL」（https://player.vimeo.com/video/…）を入れて push するだけ
    🚨 目次の時刻：録画を見てから CHAPTERS の t に "12:34" や "1:02:30" の形で入れる。空のあいだは時刻なしで表示され、押せない
-   （目次の項目名・順番は、YCS山下さんコンサルの続きのセッションで決定・メールの目次と揃えてある。勝手に変えない） */
+   （目次の項目名・順番・時刻は、YCS山下さんコンサルの続きのセッションで確定・メールの目次と揃えてある。勝手に変えない。
+   🚨オープニング（なぜこの会を開いたか）は録画に入っていないので目次にも入れない） */
 (function(){
   var ARCHIVE_VIMEO = "";
   var CHAPTERS = [
-    { t: "", title: "オープニング（なぜこの会を開いたか）" },
-    { t: "", title: "気候変動トークセッション", sub: "あさきちゃんのお話／川田むつみさん × レムケなつこの対談／みんなで意見交換" },
-    { t: "", title: "挑戦者トークセッション", sub: "猿田一生さん／森奈央さん／羽田野嘉雄さん" },
-    { t: "", title: "マッチング交流会（小部屋を私が回っている様子）" },
-    { t: "", title: "新しい3つの場所の発表" },
-    { t: "", title: "ゆうきちゃんのお話" },
-    { t: "", title: "フィナーレ", sub: "今日の一言を持ち寄って、また会おうね！" }
+    { t: "0:00",    title: "気候変動トークセッション" },
+    { t: "1:37",    title: "あさきちゃんのお話（千葉の豪雨）", lv: 2 },
+    { t: "6:05",    title: "川田むつみさん × レムケなつこ の対談", lv: 2 },
+    { t: "22:54",   title: "みんなで意見交換", lv: 2 },
+    { t: "27:04",   title: "挑戦者トークセッション" },
+    { t: "28:26",   title: "猿田一生さん", lv: 2 },
+    { t: "35:51",   title: "森奈央さん", lv: 2 },
+    { t: "45:55",   title: "羽田野嘉雄さん", lv: 2 },
+    { t: "56:17",   title: "マッチング交流会の説明" },
+    { t: "1:08:57", title: "ラウンド1 応援を受け取る", lv: 2 },
+    { t: "1:38:13", title: "ラウンド2 次の誰かに渡す", lv: 2 },
+    { t: "1:57:23", title: "みんなでふり返り", lv: 2 },
+    { t: "2:08:43", title: "【初公開】これから1年、一緒に挑戦するための3つの場所" },
+    { t: "2:10:10", title: "Daily Letters", lv: 2 },
+    { t: "2:19:48", title: "共同学習会（Startup Circle）", lv: 2 },
+    { t: "2:22:07", title: "グルコンと中間報告（Leaders Lounge）", lv: 2 },
+    { t: "2:23:23", title: "40店舗まで広がった、ゆうきちゃんの話" },
+    { t: "2:30:01", title: "価格・特典・締切のご案内" },
+    { t: "2:31:21", title: "フィナーレ　みんなの「今日の一言」" }
   ];
   if (!ARCHIVE_VIMEO || window.IOB_PHASE !== "sale") return; // 録画は9/23 23:59 JSTまで（なつこ決定・要確認中）
 
@@ -1227,6 +1243,7 @@ window.IOB_PHASE = (function(){
   CHAPTERS.forEach(function(c){
     var li = document.createElement("li"), btn = document.createElement("button");
     btn.type = "button";
+    if (c.lv === 2) li.className = "sub";
     btn.innerHTML = '<span class="tm">' + (c.t || "") + '</span><span class="tt">' + c.title + (c.sub ? '<span class="ts">' + c.sub + '</span>' : '') + '</span>';
     if (c.t) { anyTime = true; btn.addEventListener("click", function(){ seek(toSec(c.t)); }); } else { btn.disabled = true; }
     li.appendChild(btn); ol.appendChild(li);
