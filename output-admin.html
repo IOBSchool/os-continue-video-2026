@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>管理 | Daily Letters アウトプット</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <style>
+    :root{--green-dark:#2d5a3d;--green-mid:#4a7c59;--green-light:#7aaa8a;--green-pale:#e8f2eb;--beige:#f7f4ef;--cream:#fdfcf9;--gold:#c9a84c;--text-dark:#1a2e22;--text-mid:#4a5e52;--text-light:#8a9e92;--white:#fff;--red:#c0392b;}
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'Noto Sans JP',sans-serif;background:var(--beige);color:var(--text-dark);min-height:100vh;}
+    header{background:linear-gradient(135deg,var(--green-dark),var(--green-mid));padding:18px 24px;color:#fff;}
+    header h1{font-size:16px;font-weight:700;}
+    header .sub{font-size:11px;color:var(--green-light);letter-spacing:2px;text-transform:uppercase;}
+    main{max-width:960px;margin:0 auto;padding:32px 20px 80px;}
+    .card{background:#fff;border-radius:16px;padding:28px;box-shadow:0 4px 24px rgba(45,90,61,.08);margin-bottom:24px;}
+    h2{font-size:15px;color:var(--green-dark);margin-bottom:18px;}
+    label{display:block;font-size:12px;font-weight:500;color:var(--text-mid);margin-bottom:5px;}
+    input,textarea,select{width:100%;padding:11px 13px;border:1.5px solid #d4e6da;border-radius:9px;font-size:14px;font-family:inherit;background:var(--cream);color:var(--text-dark);}
+    input:focus,textarea:focus,select:focus{outline:none;border-color:var(--green-mid);background:#fff;}
+    textarea{min-height:90px;line-height:1.7;resize:vertical;}
+    .row{display:grid;gap:14px;margin-bottom:14px;}
+    .row-2{grid-template-columns:1fr 1fr;}
+    .row-3{grid-template-columns:1fr 1fr 1fr;}
+    @media(max-width:640px){.row-2,.row-3{grid-template-columns:1fr;}}
+    .btn{padding:12px 22px;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;}
+    .btn-primary{background:linear-gradient(135deg,var(--green-dark),var(--green-mid));color:#fff;}
+    .btn-ghost{background:var(--green-pale);color:var(--green-dark);}
+    .btn-danger{background:#fdeaea;color:var(--red);}
+    .btn-sm{padding:6px 12px;font-size:12px;}
+    .tabs{display:flex;gap:8px;margin-bottom:20px;}
+    .tab{padding:10px 20px;border-radius:100px;background:#fff;border:1.5px solid #d4e6da;cursor:pointer;font-size:13px;font-weight:700;color:var(--text-mid);}
+    .tab.active{background:var(--green-dark);color:#fff;border-color:var(--green-dark);}
+    table{width:100%;border-collapse:collapse;font-size:13px;}
+    th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--green-pale);vertical-align:top;}
+    th{color:var(--text-light);font-weight:500;font-size:11px;}
+    .tag{background:var(--green-pale);color:var(--green-dark);padding:2px 9px;border-radius:100px;font-size:11px;white-space:nowrap;}
+    .tag-gold{background:var(--gold);color:#fff;}
+    .error-msg{background:#fdf2f2;border:1.5px solid #e8b5b5;color:var(--red);padding:11px 15px;border-radius:9px;font-size:13px;margin-top:12px;display:none;}
+    .muted{color:var(--text-light);font-size:12px;}
+    #login-view{max-width:420px;margin:60px auto;}
+    .hidden{display:none;}
+    .answer-full{white-space:pre-wrap;line-height:1.8;font-size:13px;}
+    .toolbar{display:flex;gap:12px;align-items:end;flex-wrap:wrap;margin-bottom:18px;}
+    .toolbar .form-group{flex:1 1 240px;}
+  </style>
+</head>
+<body>
+<header>
+  <div class="sub">Daily Letters</div>
+  <h1>アウトプット管理</h1>
+</header>
+<main>
+  <!-- ログイン -->
+  <div id="login-view" class="card">
+    <h2>🔒 管理パスワード</h2>
+    <input type="password" id="login-pw" placeholder="パスワード" onkeydown="if(event.key==='Enter')doLogin()">
+    <div class="error-msg" id="login-err"></div>
+    <button class="btn btn-primary" style="width:100%;margin-top:14px;" onclick="doLogin()">ログイン</button>
+  </div>
+
+  <!-- 管理画面本体 -->
+  <div id="admin-view" class="hidden">
+    <div class="tabs">
+      <div class="tab active" data-tab="questions" onclick="switchTab('questions')">問いの管理</div>
+      <div class="tab" data-tab="responses" onclick="switchTab('responses')">回答の一覧</div>
+    </div>
+
+    <!-- 問いの管理 -->
+    <div id="tab-questions">
+      <div class="card">
+        <h2 id="q-form-title">➕ 問いを追加</h2>
+        <input type="hidden" id="q-id">
+        <div class="row row-2">
+          <div><label>ラベル（例：2026年11月／はじめの一歩）</label><input id="q-month" placeholder="2026年11月"></div>
+          <div><label>並び順（同時に複数出すとき用・小さい順）</label><input id="q-week" type="number" value="1"></div>
+        </div>
+        <div class="row row-2">
+          <div><label>書ける期間（開始）</label><input id="q-start" type="date"></div>
+          <div><label>書ける期間（終了）</label><input id="q-end" type="date"></div>
+        </div>
+        <div class="row"><div><label>テーマ（短い見出し・任意）</label><input id="q-theme" placeholder="1年の目標"></div></div>
+        <div class="row"><div><label>問い（本文）</label><textarea id="q-question" placeholder="この1年で、やってみたいことをひとつ書いてみてください。"></textarea></div></div>
+        <div class="row"><div><label>補足（任意）</label><textarea id="q-desc" placeholder="まとまっていなくてかまいません。"></textarea></div></div>
+        <div class="error-msg" id="q-err"></div>
+        <div style="display:flex;gap:12px;">
+          <button class="btn btn-primary" onclick="saveQuestion()">保存</button>
+          <button class="btn btn-ghost hidden" id="q-cancel" onclick="resetQForm()">キャンセル</button>
+        </div>
+      </div>
+      <div class="card">
+        <h2>登録済みの問い</h2>
+        <div style="overflow-x:auto;"><table id="q-table"><tbody></tbody></table></div>
+      </div>
+    </div>
+
+    <!-- 回答の一覧 -->
+    <div id="tab-responses" class="hidden">
+      <div class="card">
+        <div class="toolbar">
+          <div class="form-group"><label>問いでしぼり込む</label>
+            <select id="r-filter" onchange="loadResponses()"><option value="">すべての問い</option></select>
+          </div>
+          <button class="btn btn-ghost" onclick="downloadCsv()">CSVで書き出す</button>
+        </div>
+        <p class="muted" id="r-count">—</p>
+        <div style="overflow-x:auto;"><table id="r-table"><tbody></tbody></table></div>
+      </div>
+    </div>
+  </div>
+</main>
+<script>
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  let adminPw = '';
+  let allQuestions = [], allResponses = [];
+  const rpc = (fn, args = {}) => sb.rpc(fn, { p_pw: adminPw, ...args });
+  const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const fmtDate = iso => { const d=new Date(iso); return `${d.getFullYear()}/${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`; };
+
+  async function doLogin() {
+    const pw = document.getElementById('login-pw').value;
+    const errEl = document.getElementById('login-err'); errEl.style.display = 'none';
+    const { data: ok, error } = await sb.rpc('dl_output_admin_login', { p_pw: pw });
+    if (error || !ok) { errEl.textContent = 'パスワードが違います'; errEl.style.display = 'block'; return; }
+    adminPw = pw;
+    document.getElementById('login-view').classList.add('hidden');
+    document.getElementById('admin-view').classList.remove('hidden');
+    await loadQuestions();
+  }
+
+  function switchTab(name) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
+    document.getElementById('tab-questions').classList.toggle('hidden', name !== 'questions');
+    document.getElementById('tab-responses').classList.toggle('hidden', name !== 'responses');
+    if (name === 'responses') { fillFilter(); loadResponses(); }
+  }
+
+  // ---- 問い ----
+  async function loadQuestions() {
+    const { data } = await sb.from('dl_output_questions').select('*').order('start_date').order('week_number');
+    allQuestions = data || [];
+    const rows = allQuestions.map(q => `
+      <tr>
+        <td><span class="tag tag-gold">${esc(q.month_label)}</span></td>
+        <td>${esc(q.theme||'')}<div class="muted">${esc(q.question)}</div></td>
+        <td class="muted">${q.start_date}<br>〜${q.end_date}</td>
+        <td style="white-space:nowrap;">
+          <button class="btn btn-ghost btn-sm" onclick='editQuestion("${q.id}")'>編集</button>
+          <button class="btn btn-danger btn-sm" onclick='deleteQuestion("${q.id}")'>削除</button>
+        </td>
+      </tr>`).join('');
+    document.querySelector('#q-table tbody').innerHTML = rows ||
+      '<tr><td class="muted">まだ問いがありません。</td></tr>';
+  }
+
+  async function saveQuestion() {
+    const errEl = document.getElementById('q-err'); errEl.style.display = 'none';
+    const row = {
+      month_label: document.getElementById('q-month').value.trim(),
+      week_number: parseInt(document.getElementById('q-week').value, 10) || 1,
+      start_date:  document.getElementById('q-start').value,
+      end_date:    document.getElementById('q-end').value,
+      theme:       document.getElementById('q-theme').value.trim(),
+      question:    document.getElementById('q-question').value.trim(),
+      description: document.getElementById('q-desc').value.trim()
+    };
+    if (!row.question || !row.start_date || !row.end_date) {
+      errEl.textContent = '問い・開始日・終了日は必須です'; errEl.style.display = 'block'; return;
+    }
+    const id = document.getElementById('q-id').value;
+    const { error } = id
+      ? await rpc('dl_output_admin_update_question', { p_id: id, p_row: row })
+      : await rpc('dl_output_admin_insert_question', { p_row: row });
+    if (error) { errEl.textContent = '保存に失敗しました'; errEl.style.display = 'block'; return; }
+    resetQForm(); await loadQuestions();
+  }
+
+  function editQuestion(id) {
+    const q = allQuestions.find(x => x.id === id); if (!q) return;
+    document.getElementById('q-id').value = q.id;
+    document.getElementById('q-month').value = q.month_label || '';
+    document.getElementById('q-week').value = q.week_number || 1;
+    document.getElementById('q-start').value = q.start_date;
+    document.getElementById('q-end').value = q.end_date;
+    document.getElementById('q-theme').value = q.theme || '';
+    document.getElementById('q-question').value = q.question || '';
+    document.getElementById('q-desc').value = q.description || '';
+    document.getElementById('q-form-title').textContent = '✏️ 問いを編集';
+    document.getElementById('q-cancel').classList.remove('hidden');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  async function deleteQuestion(id) {
+    if (!confirm('この問いを削除しますか？（この問いへの回答も一緒に消えます）')) return;
+    const { error } = await rpc('dl_output_admin_delete_question', { p_id: id });
+    if (error) { alert('削除に失敗しました'); return; }
+    await loadQuestions();
+  }
+
+  function resetQForm() {
+    ['q-id','q-month','q-theme','q-question','q-desc','q-start','q-end'].forEach(i => document.getElementById(i).value = '');
+    document.getElementById('q-week').value = 1;
+    document.getElementById('q-form-title').textContent = '➕ 問いを追加';
+    document.getElementById('q-cancel').classList.add('hidden');
+    document.getElementById('q-err').style.display = 'none';
+  }
+
+  // ---- 回答 ----
+  function fillFilter() {
+    const sel = document.getElementById('r-filter');
+    const cur = sel.value;
+    sel.innerHTML = '<option value="">すべての問い</option>' +
+      allQuestions.map(q => `<option value="${q.id}">${esc(q.month_label)}｜${esc(q.theme||q.question).slice(0,20)}</option>`).join('');
+    sel.value = cur;
+  }
+
+  async function loadResponses() {
+    const qid = document.getElementById('r-filter').value;
+    const { data } = await rpc('dl_output_admin_list_responses', { p_question_id: qid || null });
+    allResponses = data || [];
+    document.getElementById('r-count').textContent = `${allResponses.length} 件`;
+    const rows = allResponses.map(r => `
+      <tr>
+        <td style="white-space:nowrap;"><span class="tag">${esc(r.month_label)}</span><div class="muted" style="margin-top:4px;">${fmtDate(r.created_at)}</div></td>
+        <td style="white-space:nowrap;">${esc(r.name)}<div class="muted">${esc(r.email||'')}</div></td>
+        <td><div class="muted" style="margin-bottom:6px;">Q. ${esc(r.question_text||'')}</div><div class="answer-full">${esc(r.answer)}</div></td>
+        <td><button class="btn btn-danger btn-sm" onclick='deleteResponse("${r.id}")'>削除</button></td>
+      </tr>`).join('');
+    document.querySelector('#r-table tbody').innerHTML = rows ||
+      '<tr><td class="muted">まだ回答がありません。</td></tr>';
+  }
+
+  async function deleteResponse(id) {
+    if (!confirm('この回答を削除しますか？')) return;
+    const { error } = await rpc('dl_output_admin_delete_response', { p_id: id });
+    if (error) { alert('削除に失敗しました'); return; }
+    await loadResponses();
+  }
+
+  function downloadCsv() {
+    if (!allResponses.length) { alert('書き出す回答がありません'); return; }
+    const head = ['日時','お名前','メール','ラベル','テーマ','問い','答え'];
+    const esc2 = s => `"${String(s ?? '').replace(/"/g,'""')}"`;
+    const lines = [head.map(esc2).join(',')].concat(allResponses.map(r =>
+      [fmtDate(r.created_at), r.name, r.email||'', r.month_label, r.theme||'', r.question_text||'', r.answer].map(esc2).join(',')));
+    const blob = new Blob(['﻿' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8;' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `daily-letters-outputs-${new Date().toISOString().slice(0,10)}.csv`;
+    a.click();
+  }
+</script>
+</body>
+</html>

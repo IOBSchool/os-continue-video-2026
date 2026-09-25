@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>アウトプット | Daily Letters</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Noto+Serif+JP:wght@300;400;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <style>
+    :root {
+      --green-dark:#2d5a3d; --green-mid:#4a7c59; --green-light:#7aaa8a;
+      --green-pale:#e8f2eb; --beige:#f7f4ef; --cream:#fdfcf9;
+      --gold:#c9a84c; --text-dark:#1a2e22; --text-mid:#4a5e52;
+      --text-light:#8a9e92; --white:#ffffff; --red:#c0392b;
+    }
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'Noto Sans JP',sans-serif;background:var(--beige);color:var(--text-dark);min-height:100vh;}
+    header{background:linear-gradient(135deg,var(--green-dark),var(--green-mid));padding:20px 24px;text-align:center;box-shadow:0 2px 16px rgba(45,90,61,.2);}
+    header .label{color:var(--green-light);font-size:11px;letter-spacing:3px;text-transform:uppercase;}
+    header h1{color:var(--white);font-size:18px;font-weight:400;margin-top:4px;font-family:'Noto Serif JP',serif;}
+    .header-nav{margin-top:12px;display:flex;justify-content:center;gap:16px;}
+    .header-nav a{color:var(--green-dark);background:var(--white);font-size:13px;font-weight:700;text-decoration:none;padding:7px 18px;border:none;border-radius:100px;transition:all .2s;box-shadow:0 2px 10px rgba(0,0,0,.12);}
+    .header-nav a:hover{background:var(--gold);color:#fff;transform:translateY(-1px);}
+    .mypage-cta{display:flex;align-items:center;gap:12px;margin-top:24px;padding:20px 24px;background:var(--white);border:2px solid var(--green-mid);border-radius:16px;color:var(--green-dark);font-size:15px;font-weight:700;text-decoration:none;box-shadow:0 4px 20px rgba(45,90,61,.1);transition:all .2s;}
+    .mypage-cta:hover{background:var(--green-pale);transform:translateY(-1px);box-shadow:0 6px 24px rgba(45,90,61,.16);}
+    .mypage-cta .cta-icon{font-size:22px;}
+    .mypage-cta .cta-sub{display:block;font-size:11px;font-weight:400;color:var(--text-light);margin-top:3px;}
+    .mypage-cta .cta-arrow{margin-left:auto;color:var(--green-mid);font-size:18px;}
+    main{max-width:680px;margin:0 auto;padding:40px 20px 80px;}
+    .q-tabs{margin-bottom:24px;}
+    .q-tabs-lead{font-size:13px;color:var(--text-mid);line-height:1.7;margin-bottom:12px;}
+    .q-tabs-list{display:flex;flex-wrap:wrap;gap:10px;}
+    .q-tab{flex:1 1 200px;text-align:left;padding:14px 18px;background:var(--white);border:2px solid #d4e6da;border-radius:14px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;color:var(--text-mid);transition:all .2s;}
+    .q-tab:hover{border-color:var(--green-light);transform:translateY(-1px);}
+    .q-tab .qt-week{display:block;font-size:11px;font-weight:700;letter-spacing:1px;color:var(--green-mid);margin-bottom:4px;}
+    .q-tab .qt-text{display:block;font-size:13px;line-height:1.6;}
+    .q-tab.active{background:var(--green-dark);border-color:var(--green-dark);color:var(--white);box-shadow:0 4px 18px rgba(45,90,61,.22);}
+    .q-tab.active .qt-week{color:var(--gold);}
+    .week-badge{display:inline-flex;align-items:center;gap:8px;background:var(--gold);color:var(--white);padding:6px 16px;border-radius:100px;font-size:13px;font-weight:700;letter-spacing:1px;margin-bottom:20px;}
+    .question-card{background:var(--white);border-radius:20px;overflow:hidden;box-shadow:0 8px 40px rgba(45,90,61,.1);margin-bottom:28px;}
+    .question-header{background:linear-gradient(135deg,var(--green-dark),var(--green-mid));padding:32px 36px;}
+    .question-header .theme-label{color:var(--green-light);font-size:11px;letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;}
+    .question-header .question-text{color:var(--white);font-size:19px;font-family:'Noto Serif JP',serif;font-weight:400;line-height:1.7;}
+    .question-header .question-desc{color:rgba(255,255,255,.65);font-size:13px;margin-top:12px;line-height:1.7;}
+    .question-period{padding:14px 36px;background:var(--green-pale);font-size:12px;color:var(--green-mid);display:flex;align-items:center;gap:8px;}
+    .form-card{background:var(--white);border-radius:20px;padding:36px;box-shadow:0 4px 24px rgba(45,90,61,.08);}
+    .form-card h2{font-size:16px;color:var(--green-dark);font-weight:700;margin-bottom:24px;}
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;}
+    @media(max-width:500px){.form-row{grid-template-columns:1fr;}}
+    .form-group{margin-bottom:16px;}
+    .form-group label{display:block;font-size:13px;font-weight:500;color:var(--text-mid);margin-bottom:6px;}
+    .form-group label .req{color:var(--red);margin-left:4px;font-size:11px;}
+    .form-group input,.form-group textarea{width:100%;padding:12px 14px;border:1.5px solid #d4e6da;border-radius:10px;font-size:14px;font-family:'Noto Sans JP',sans-serif;color:var(--text-dark);background:var(--cream);transition:border-color .2s,box-shadow .2s;resize:vertical;}
+    .form-group input:focus,.form-group textarea:focus{outline:none;border-color:var(--green-mid);box-shadow:0 0 0 3px rgba(74,124,89,.12);background:var(--white);}
+    .form-group textarea{min-height:180px;line-height:1.8;}
+    .char-count{font-size:11px;color:var(--text-light);text-align:right;margin-top:4px;}
+    .btn-submit{width:100%;padding:16px;background:linear-gradient(135deg,var(--green-dark),var(--green-mid));color:var(--white);border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;margin-top:8px;transition:opacity .2s,transform .1s;letter-spacing:1px;}
+    .btn-submit:hover{opacity:.9;transform:translateY(-1px);}
+    .btn-submit:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+    .empty-state{text-align:center;padding:60px 20px;background:var(--white);border-radius:20px;box-shadow:0 4px 24px rgba(45,90,61,.08);}
+    .empty-state .icon{font-size:56px;margin-bottom:16px;}
+    .empty-state h2{font-size:18px;color:var(--green-dark);margin-bottom:8px;}
+    .empty-state p{font-size:14px;color:var(--text-light);line-height:1.7;}
+    #success-screen{display:none;text-align:center;padding:60px 20px;background:var(--white);border-radius:20px;box-shadow:0 8px 40px rgba(45,90,61,.12);}
+    #success-screen .icon{font-size:64px;margin-bottom:20px;}
+    #success-screen h2{font-size:22px;color:var(--green-dark);font-family:'Noto Serif JP',serif;font-weight:400;margin-bottom:12px;}
+    #success-screen p{font-size:14px;color:var(--text-mid);line-height:1.8;}
+    .btn-back{display:inline-block;margin-top:28px;padding:12px 32px;background:var(--green-pale);color:var(--green-dark);border-radius:100px;font-size:14px;font-weight:500;cursor:pointer;border:none;}
+    .loading{text-align:center;padding:60px;color:var(--text-light);font-size:14px;}
+    .error-msg{background:#fdf2f2;border:1.5px solid #e8b5b5;color:var(--red);padding:12px 16px;border-radius:10px;font-size:13px;margin-top:12px;display:none;}
+  </style>
+</head>
+<body>
+<header>
+  <p class="label">Daily Letters</p>
+  <h1>今日のアウトプット</h1>
+  <nav class="header-nav">
+    <a href="output-mypage.html">📋 マイページ（書いたものを読み返す）</a>
+  </nav>
+</header>
+<main>
+  <div id="loading" class="loading">読み込み中...</div>
+
+  <div id="no-question" style="display:none;">
+    <div class="empty-state">
+      <div class="icon">🌱</div>
+      <h2>いまは書く問いはお休み中です</h2>
+      <p>アウトプットの期間になると、この場所に問いが届きます。<br>それまでは、毎日のお手紙を受け取りながら、あなたのペースで進めてください。</p>
+    </div>
+  </div>
+
+  <div id="question-form" style="display:none;">
+    <div id="q-tabs" class="q-tabs" style="display:none;">
+      <p class="q-tabs-lead">いま、2つの問いに書いていただけます。書きたい問いを選んでください。</p>
+      <div id="q-tabs-list" class="q-tabs-list"></div>
+    </div>
+    <div class="week-badge">
+      <span>🖋️</span><span id="week-label">問い</span>
+    </div>
+    <div class="question-card">
+      <div class="question-header">
+        <p class="theme-label" id="theme-label"></p>
+        <p class="question-text" id="question-text"></p>
+        <p class="question-desc" id="question-desc"></p>
+      </div>
+      <div class="question-period">
+        <span>📆</span><span id="period-text"></span>
+      </div>
+    </div>
+    <div class="form-card">
+      <h2>✏️ あなたの言葉で書いてください</h2>
+      <div class="form-group">
+        <label>お名前<span class="req">必須</span></label>
+        <input type="text" id="input-name" placeholder="れむけ なつこ" maxlength="50">
+      </div>
+      <div class="form-group">
+        <label>メールアドレス<span style="color:var(--text-light);font-size:11px;margin-left:6px;">（あとでマイページから読み返すときに使います）</span></label>
+        <input type="email" id="input-email" placeholder="お申し込み時のメールアドレス" maxlength="100">
+      </div>
+      <div class="form-group">
+        <label>あなたの答え<span class="req">必須</span></label>
+        <textarea id="input-answer" placeholder="正解はありません。思ったこと、いま感じていることを、そのまま書いてください。"></textarea>
+        <div class="char-count"><span id="char-count">0</span> 文字</div>
+      </div>
+      <div class="error-msg" id="error-msg"></div>
+      <button class="btn-submit" id="btn-submit" onclick="submitAnswer()">書いたものを残す</button>
+    </div>
+    <a class="mypage-cta" href="output-mypage.html">
+      <span class="cta-icon">📋</span>
+      <span>これまでに書いたものを読み返す
+        <span class="cta-sub">お名前とメールアドレスで、いつでも見返せます</span>
+      </span>
+      <span class="cta-arrow">→</span>
+    </a>
+  </div>
+
+  <div id="success-screen">
+    <div class="icon">🌿</div>
+    <h2>受け取りました</h2>
+    <p id="success-msg"></p>
+    <button class="btn-back" onclick="resetForm()">別の問いにも書く</button>
+  </div>
+</main>
+
+<script>
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  let currentQuestion = null;
+  let activeQuestions = [];
+
+  window.addEventListener('DOMContentLoaded', loadQuestion);
+
+  async function loadQuestion() {
+    try {
+      // 日本時間(JST=UTC+9)の暦日で判定する。
+      // (new Date().toISOString() はUTC基準のため、JSTでは最大9時間ズレてしまう問題への対処)
+      const today = new Date(Date.now() + 9 * 60 * 60 * 1000).toISOString().slice(0, 10);
+      // 期間が重なっている問いは全部出す（例：Day1の目標と、その月のアウトプットが並ぶ）
+      const { data, error } = await sb
+        .from('dl_output_questions')
+        .select('*')
+        .lte('start_date', today)
+        .gte('end_date', today)
+        .order('week_number');
+
+      document.getElementById('loading').style.display = 'none';
+      if (error) throw error;
+      if (!data || !data.length) { document.getElementById('no-question').style.display = 'block'; return; }
+
+      activeQuestions = data;
+      renderTabs();
+      selectQuestion(0);
+      document.getElementById('question-form').style.display = 'block';
+    } catch(e) {
+      document.getElementById('loading').textContent = '読み込みに失敗しました。ページを再読み込みしてください。';
+    }
+  }
+
+  // 問いが2つ以上あるときだけ、選択ボタンを出す（1つのときは今までと同じ見た目）
+  function renderTabs() {
+    const wrap = document.getElementById('q-tabs');
+    if (activeQuestions.length < 2) { wrap.style.display = 'none'; return; }
+    document.querySelector('.q-tabs-lead').textContent =
+      `いま、${activeQuestions.length}つの問いに書いていただけます。書きたい問いを選んでください。`;
+    document.getElementById('q-tabs-list').innerHTML = activeQuestions.map((q, i) =>
+      `<button type="button" class="q-tab" data-idx="${i}">
+         <span class="qt-week">${escapeHtml(q.month_label || '問い')}</span>
+         <span class="qt-text">${escapeHtml(q.theme || q.question)}</span>
+       </button>`).join('');
+    document.querySelectorAll('.q-tab').forEach(btn =>
+      btn.addEventListener('click', () => selectQuestion(parseInt(btn.dataset.idx, 10))));
+    wrap.style.display = 'block';
+  }
+
+  function selectQuestion(idx) {
+    const q = activeQuestions[idx];
+    if (!q) return;
+    currentQuestion = q;
+    document.querySelectorAll('.q-tab').forEach(btn =>
+      btn.classList.toggle('active', parseInt(btn.dataset.idx, 10) === idx));
+    document.getElementById('week-label').textContent = q.month_label || '問い';
+    document.getElementById('theme-label').textContent = q.theme || '';
+    document.getElementById('question-text').textContent = q.question;
+    const desc = document.getElementById('question-desc');
+    desc.textContent = q.description || '';
+    desc.style.display = q.description ? 'block' : 'none';
+    document.getElementById('period-text').textContent =
+      `書ける期間：${fmtDate(q.start_date)} 〜 ${fmtDate(q.end_date)}`;
+    document.getElementById('success-screen').style.display = 'none';
+    document.getElementById('question-form').style.display = 'block';
+  }
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, c =>
+      ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  function fmtDate(s) {
+    const d = new Date(s);
+    return `${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日`;
+  }
+
+  document.getElementById('input-answer').addEventListener('input', function() {
+    document.getElementById('char-count').textContent = this.value.length;
+  });
+
+  async function submitAnswer() {
+    const name   = document.getElementById('input-name').value.trim();
+    const email  = document.getElementById('input-email').value.trim().toLowerCase();
+    const answer = document.getElementById('input-answer').value.trim();
+    const errEl  = document.getElementById('error-msg');
+    errEl.style.display = 'none';
+
+    if (!name)   return showErr('お名前を入力してください');
+    if (!answer) return showErr('答えを入力してください');
+
+    const btn = document.getElementById('btn-submit');
+    btn.disabled = true; btn.textContent = '送信中...';
+
+    const { error } = await sb.from('dl_output_responses').insert({
+      question_id:   currentQuestion.id,
+      question_text: currentQuestion.question,
+      week_number:   currentQuestion.week_number,
+      month_label:   currentQuestion.month_label,
+      theme:         currentQuestion.theme,
+      name, email, answer
+    });
+
+    if (error) {
+      showErr('送信に失敗しました。もう一度お試しください。');
+      btn.disabled = false; btn.textContent = '書いたものを残す';
+      return;
+    }
+
+    document.getElementById('question-form').style.display = 'none';
+    const more = activeQuestions.length > 1
+      ? '<br>ほかの問いにも、続けて書いていただけます。' : '';
+    document.getElementById('success-msg').innerHTML =
+      `${escapeHtml(name)}さん、ありがとうございます。<br>あなたの言葉を受け取りました。マイページからいつでも読み返せます。${more}`;
+    document.getElementById('success-screen').style.display = 'block';
+  }
+
+  function showErr(msg) {
+    const el = document.getElementById('error-msg');
+    el.textContent = msg; el.style.display = 'block';
+  }
+
+  function resetForm() {
+    document.getElementById('input-answer').value = '';
+    document.getElementById('char-count').textContent = '0';
+    document.getElementById('error-msg').style.display = 'none';
+    document.getElementById('btn-submit').disabled = false;
+    document.getElementById('btn-submit').textContent = '書いたものを残す';
+    document.getElementById('success-screen').style.display = 'none';
+    document.getElementById('question-form').style.display = 'block';
+  }
+</script>
+</body>
+</html>

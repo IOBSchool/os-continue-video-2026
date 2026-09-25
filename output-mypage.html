@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>マイページ | Daily Letters</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Noto+Serif+JP:wght@300;400;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <style>
+    :root{--green-dark:#2d5a3d;--green-mid:#4a7c59;--green-light:#7aaa8a;--green-pale:#e8f2eb;--beige:#f7f4ef;--cream:#fdfcf9;--gold:#c9a84c;--text-dark:#1a2e22;--text-mid:#4a5e52;--text-light:#8a9e92;--white:#ffffff;--red:#c0392b;}
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'Noto Sans JP',sans-serif;background:var(--beige);color:var(--text-dark);min-height:100vh;}
+    header{background:linear-gradient(135deg,var(--green-dark),var(--green-mid));padding:20px 24px;text-align:center;box-shadow:0 2px 16px rgba(45,90,61,.2);}
+    header .label{color:var(--green-light);font-size:11px;letter-spacing:3px;text-transform:uppercase;}
+    header h1{color:var(--white);font-size:18px;font-weight:400;margin-top:4px;font-family:'Noto Serif JP',serif;}
+    .header-nav{margin-top:12px;display:flex;justify-content:center;gap:16px;}
+    .header-nav a{color:rgba(255,255,255,.7);font-size:12px;text-decoration:none;padding:4px 12px;border:1px solid rgba(255,255,255,.3);border-radius:100px;transition:all .2s;}
+    .header-nav a:hover{background:rgba(255,255,255,.1);color:#fff;}
+    main{max-width:680px;margin:0 auto;padding:40px 20px 80px;}
+    .search-card{background:var(--white);border-radius:20px;padding:36px;box-shadow:0 4px 24px rgba(45,90,61,.08);margin-bottom:28px;}
+    .search-card h2{font-size:16px;color:var(--green-dark);font-weight:700;margin-bottom:6px;}
+    .search-card p{font-size:13px;color:var(--text-light);margin-bottom:24px;line-height:1.6;}
+    .search-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;}
+    @media(max-width:500px){.search-row{grid-template-columns:1fr;}}
+    .form-group label{display:block;font-size:12px;font-weight:500;color:var(--text-mid);margin-bottom:6px;}
+    .form-group input{width:100%;padding:12px 14px;border:1.5px solid #d4e6da;border-radius:10px;font-size:14px;font-family:'Noto Sans JP',sans-serif;color:var(--text-dark);background:var(--cream);transition:border-color .2s;}
+    .form-group input:focus{outline:none;border-color:var(--green-mid);background:var(--white);}
+    .btn-search{width:100%;padding:14px;background:linear-gradient(135deg,var(--green-dark),var(--green-mid));color:var(--white);border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;transition:opacity .2s;}
+    .btn-search:hover{opacity:.9;}
+    .btn-search:disabled{opacity:.5;cursor:not-allowed;}
+    .error-msg{background:#fdf2f2;border:1.5px solid #e8b5b5;color:var(--red);padding:12px 16px;border-radius:10px;font-size:13px;margin-top:12px;display:none;}
+    #results{display:none;}
+    .results-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+    .results-header h3{font-size:15px;color:var(--green-dark);font-weight:700;}
+    .results-count{background:var(--green-pale);color:var(--green-mid);padding:4px 12px;border-radius:100px;font-size:12px;font-weight:700;}
+    .answer-card{background:var(--white);border-radius:16px;padding:24px 28px;box-shadow:0 2px 12px rgba(45,90,61,.07);margin-bottom:16px;border-left:4px solid var(--green-mid);}
+    .answer-meta{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px;align-items:center;}
+    .meta-week{background:var(--gold);color:var(--white);padding:3px 10px;border-radius:100px;font-size:11px;font-weight:700;}
+    .meta-theme{background:var(--green-pale);color:var(--green-dark);padding:3px 10px;border-radius:100px;font-size:11px;}
+    .meta-date{font-size:11px;color:var(--text-light);margin-left:auto;}
+    .answer-question{font-size:13px;color:var(--text-mid);margin-bottom:12px;line-height:1.6;padding-bottom:12px;border-bottom:1px solid var(--green-pale);}
+    .answer-question::before{content:"Q. ";font-weight:700;color:var(--green-mid);}
+    .answer-body{font-size:14px;color:var(--text-dark);line-height:1.8;}
+    .empty-state{text-align:center;padding:48px 20px;background:var(--white);border-radius:16px;box-shadow:0 2px 12px rgba(45,90,61,.07);}
+    .empty-state .icon{font-size:48px;margin-bottom:14px;}
+    .empty-state h3{font-size:16px;color:var(--green-dark);margin-bottom:8px;}
+    .empty-state p{font-size:13px;color:var(--text-light);line-height:1.7;}
+  </style>
+</head>
+<body>
+<header>
+  <p class="label">Daily Letters</p>
+  <h1>マイページ — 書いたものを読み返す</h1>
+  <nav class="header-nav">
+    <a href="output.html">✏️ 今の問いに書く</a>
+  </nav>
+</header>
+<main>
+  <div class="search-card">
+    <h2>📋 これまでに書いたものを読み返す</h2>
+    <p>書いたときに入力したお名前とメールアドレスで、あなたの言葉だけを呼び出します。</p>
+    <div class="search-row">
+      <div class="form-group">
+        <label>お名前（書いたときと同じ）</label>
+        <input type="text" id="search-name" placeholder="れむけ なつこ">
+      </div>
+      <div class="form-group">
+        <label>メールアドレス</label>
+        <input type="email" id="search-email" placeholder="お申し込み時のメールアドレス">
+      </div>
+    </div>
+    <div class="error-msg" id="error-msg"></div>
+    <button class="btn-search" id="btn-search" onclick="searchMyPage()">読み返す</button>
+  </div>
+  <div id="results">
+    <div class="results-header">
+      <h3>あなたが書いてきたもの</h3>
+      <span class="results-count" id="results-count">0件</span>
+    </div>
+    <div id="results-list"></div>
+  </div>
+</main>
+<script>
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  document.addEventListener('keydown', e => { if (e.key === 'Enter') searchMyPage(); });
+
+  async function searchMyPage() {
+    const name  = document.getElementById('search-name').value.trim();
+    const email = document.getElementById('search-email').value.trim().toLowerCase();
+    const errEl = document.getElementById('error-msg');
+    errEl.style.display = 'none';
+    if (!name)  return showErr('お名前を入力してください');
+    if (!email) return showErr('メールアドレスを入力してください');
+
+    const btn = document.getElementById('btn-search');
+    btn.disabled = true; btn.textContent = '読み込み中...';
+
+    // 名前とメールが両方一致した回答だけをサーバー側で返す（一覧の丸ごと取得はできない）
+    const { data, error } = await sb.rpc('dl_output_my_responses', { p_name: name, p_email: email });
+
+    btn.disabled = false; btn.textContent = '読み返す';
+
+    if (error) return showErr('読み込みに失敗しました。もう一度お試しください。');
+    renderResults(data, name);
+  }
+
+  function renderResults(items, name) {
+    document.getElementById('results-count').textContent = `${items.length}件`;
+    document.getElementById('results').style.display = 'block';
+    const container = document.getElementById('results-list');
+
+    if (!items.length) {
+      container.innerHTML = `<div class="empty-state"><div class="icon">🔍</div><h3>まだ見つかりませんでした</h3><p>「${esc(name)}」さんの記録は見つかりませんでした。<br>お名前とメールアドレスが、書いたときと同じか確認してください。</p></div>`;
+      return;
+    }
+
+    container.innerHTML = items.map(r => `
+      <div class="answer-card">
+        <div class="answer-meta">
+          <span class="meta-week">${esc(r.month_label||'')}</span>
+          <span class="meta-theme">${esc(r.theme||'')}</span>
+          <span class="meta-date">${fmtDate(r.created_at)}</span>
+        </div>
+        <p class="answer-question">${esc(r.question_text||'')}</p>
+        <p class="answer-body">${esc(r.answer).replace(/\n/g,'<br>')}</p>
+      </div>`).join('');
+  }
+
+  function showErr(msg) { const el=document.getElementById('error-msg'); el.textContent=msg; el.style.display='block'; }
+  function fmtDate(iso) { const d=new Date(iso); return `${d.getFullYear()}/${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`; }
+  function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+</script>
+</body>
+</html>
